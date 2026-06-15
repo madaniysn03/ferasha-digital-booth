@@ -2,12 +2,13 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Compass, Store, PlusCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items = [
+type NavItem = { to: string; label: string; icon: typeof Compass; highlight?: boolean };
+const items: NavItem[] = [
   { to: "/", label: "Explorer", icon: Compass },
   { to: "/my-ferasha", label: "Ma Ferasha", icon: Store },
   { to: "/listings/new", label: "Publier", icon: PlusCircle, highlight: true },
   { to: "/account", label: "Compte", icon: User },
-] as const;
+];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

@@ -14,7 +14,146 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ferashas: {
+        Row: {
+          bio: string | null
+          category: Database["public"]["Enums"]["ferasha_category"]
+          city: string
+          created_at: string
+          email: string | null
+          id: string
+          instagram: string | null
+          is_published: boolean
+          logo_url: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          slug: string
+          updated_at: string
+          views_count: number
+          whatsapp: string | null
+        }
+        Insert: {
+          bio?: string | null
+          category: Database["public"]["Enums"]["ferasha_category"]
+          city: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          is_published?: boolean
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          slug: string
+          updated_at?: string
+          views_count?: number
+          whatsapp?: string | null
+        }
+        Update: {
+          bio?: string | null
+          category?: Database["public"]["Enums"]["ferasha_category"]
+          city?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          is_published?: boolean
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          slug?: string
+          updated_at?: string
+          views_count?: number
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      listings: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          ferasha_id: string
+          id: string
+          image_url: string | null
+          owner_id: string
+          price: number | null
+          status: Database["public"]["Enums"]["listing_status"]
+          title: string
+          type: Database["public"]["Enums"]["listing_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          ferasha_id: string
+          id?: string
+          image_url?: string | null
+          owner_id: string
+          price?: number | null
+          status?: Database["public"]["Enums"]["listing_status"]
+          title: string
+          type?: Database["public"]["Enums"]["listing_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          ferasha_id?: string
+          id?: string
+          image_url?: string | null
+          owner_id?: string
+          price?: number | null
+          status?: Database["public"]["Enums"]["listing_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["listing_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_ferasha_id_fkey"
+            columns: ["ferasha_id"]
+            isOneToOne: false
+            referencedRelation: "ferashas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +162,21 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      ferasha_category:
+        | "artisanat"
+        | "beaute"
+        | "mode"
+        | "alimentation"
+        | "services"
+        | "bricolage"
+        | "tech"
+        | "education"
+        | "sante"
+        | "transport"
+        | "evenementiel"
+        | "autre"
+      listing_status: "actif" | "pause"
+      listing_type: "produit" | "service"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +303,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ferasha_category: [
+        "artisanat",
+        "beaute",
+        "mode",
+        "alimentation",
+        "services",
+        "bricolage",
+        "tech",
+        "education",
+        "sante",
+        "transport",
+        "evenementiel",
+        "autre",
+      ],
+      listing_status: ["actif", "pause"],
+      listing_type: ["produit", "service"],
+    },
   },
 } as const

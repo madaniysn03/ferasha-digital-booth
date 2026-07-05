@@ -9,15 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as DevenirProRouteImport } from './routes/devenir-pro'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FerashaSlugRouteImport } from './routes/ferasha.$slug'
-import { Route as AuthenticatedMyFerashaRouteImport } from './routes/_authenticated/my-ferasha'
+import { Route as AuthenticatedSuperadminRouteImport } from './routes/_authenticated/superadmin'
+import { Route as AuthenticatedMesAvisRouteImport } from './routes/_authenticated/mes-avis'
+import { Route as AuthenticatedChangePasswordRouteImport } from './routes/_authenticated/change-password'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedMyFerashaIndexRouteImport } from './routes/_authenticated/my-ferasha.index'
+import { Route as AuthenticatedMyFerashaNewRouteImport } from './routes/_authenticated/my-ferasha.new'
+import { Route as AuthenticatedMyFerashaIdRouteImport } from './routes/_authenticated/my-ferasha.$id'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 import { Route as AuthenticatedListingsIdRouteImport } from './routes/_authenticated/listings.$id'
 
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevenirProRoute = DevenirProRouteImport.update({
+  id: '/devenir-pro',
+  path: '/devenir-pro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -37,16 +60,45 @@ const FerashaSlugRoute = FerashaSlugRouteImport.update({
   path: '/ferasha/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedMyFerashaRoute = AuthenticatedMyFerashaRouteImport.update({
-  id: '/my-ferasha',
-  path: '/my-ferasha',
+const AuthenticatedSuperadminRoute = AuthenticatedSuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMesAvisRoute = AuthenticatedMesAvisRouteImport.update({
+  id: '/mes-avis',
+  path: '/mes-avis',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedChangePasswordRoute =
+  AuthenticatedChangePasswordRouteImport.update({
+    id: '/change-password',
+    path: '/change-password',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMyFerashaIndexRoute =
+  AuthenticatedMyFerashaIndexRouteImport.update({
+    id: '/my-ferasha/',
+    path: '/my-ferasha/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMyFerashaNewRoute =
+  AuthenticatedMyFerashaNewRouteImport.update({
+    id: '/my-ferasha/new',
+    path: '/my-ferasha/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMyFerashaIdRoute =
+  AuthenticatedMyFerashaIdRouteImport.update({
+    id: '/my-ferasha/$id',
+    path: '/my-ferasha/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
     id: '/listings/new',
@@ -62,72 +114,144 @@ const AuthenticatedListingsIdRoute = AuthenticatedListingsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/devenir-pro': typeof DevenirProRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/account': typeof AuthenticatedAccountRoute
-  '/my-ferasha': typeof AuthenticatedMyFerashaRoute
+  '/change-password': typeof AuthenticatedChangePasswordRoute
+  '/mes-avis': typeof AuthenticatedMesAvisRoute
+  '/superadmin': typeof AuthenticatedSuperadminRoute
   '/ferasha/$slug': typeof FerashaSlugRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/my-ferasha/$id': typeof AuthenticatedMyFerashaIdRoute
+  '/my-ferasha/new': typeof AuthenticatedMyFerashaNewRoute
+  '/my-ferasha/': typeof AuthenticatedMyFerashaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/devenir-pro': typeof DevenirProRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/account': typeof AuthenticatedAccountRoute
-  '/my-ferasha': typeof AuthenticatedMyFerashaRoute
+  '/change-password': typeof AuthenticatedChangePasswordRoute
+  '/mes-avis': typeof AuthenticatedMesAvisRoute
+  '/superadmin': typeof AuthenticatedSuperadminRoute
   '/ferasha/$slug': typeof FerashaSlugRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/my-ferasha/$id': typeof AuthenticatedMyFerashaIdRoute
+  '/my-ferasha/new': typeof AuthenticatedMyFerashaNewRoute
+  '/my-ferasha': typeof AuthenticatedMyFerashaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/devenir-pro': typeof DevenirProRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
-  '/_authenticated/my-ferasha': typeof AuthenticatedMyFerashaRoute
+  '/_authenticated/change-password': typeof AuthenticatedChangePasswordRoute
+  '/_authenticated/mes-avis': typeof AuthenticatedMesAvisRoute
+  '/_authenticated/superadmin': typeof AuthenticatedSuperadminRoute
   '/ferasha/$slug': typeof FerashaSlugRoute
   '/_authenticated/listings/$id': typeof AuthenticatedListingsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
+  '/_authenticated/my-ferasha/$id': typeof AuthenticatedMyFerashaIdRoute
+  '/_authenticated/my-ferasha/new': typeof AuthenticatedMyFerashaNewRoute
+  '/_authenticated/my-ferasha/': typeof AuthenticatedMyFerashaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/confidentialite'
+    | '/devenir-pro'
+    | '/mentions-legales'
     | '/account'
-    | '/my-ferasha'
+    | '/change-password'
+    | '/mes-avis'
+    | '/superadmin'
     | '/ferasha/$slug'
     | '/listings/$id'
     | '/listings/new'
+    | '/my-ferasha/$id'
+    | '/my-ferasha/new'
+    | '/my-ferasha/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/confidentialite'
+    | '/devenir-pro'
+    | '/mentions-legales'
     | '/account'
-    | '/my-ferasha'
+    | '/change-password'
+    | '/mes-avis'
+    | '/superadmin'
     | '/ferasha/$slug'
     | '/listings/$id'
     | '/listings/new'
+    | '/my-ferasha/$id'
+    | '/my-ferasha/new'
+    | '/my-ferasha'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/confidentialite'
+    | '/devenir-pro'
+    | '/mentions-legales'
     | '/_authenticated/account'
-    | '/_authenticated/my-ferasha'
+    | '/_authenticated/change-password'
+    | '/_authenticated/mes-avis'
+    | '/_authenticated/superadmin'
     | '/ferasha/$slug'
     | '/_authenticated/listings/$id'
     | '/_authenticated/listings/new'
+    | '/_authenticated/my-ferasha/$id'
+    | '/_authenticated/my-ferasha/new'
+    | '/_authenticated/my-ferasha/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
+  DevenirProRoute: typeof DevenirProRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
   FerashaSlugRoute: typeof FerashaSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/devenir-pro': {
+      id: '/devenir-pro'
+      path: '/devenir-pro'
+      fullPath: '/devenir-pro'
+      preLoaderRoute: typeof DevenirProRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -156,11 +280,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FerashaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/my-ferasha': {
-      id: '/_authenticated/my-ferasha'
-      path: '/my-ferasha'
-      fullPath: '/my-ferasha'
-      preLoaderRoute: typeof AuthenticatedMyFerashaRouteImport
+    '/_authenticated/superadmin': {
+      id: '/_authenticated/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof AuthenticatedSuperadminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mes-avis': {
+      id: '/_authenticated/mes-avis'
+      path: '/mes-avis'
+      fullPath: '/mes-avis'
+      preLoaderRoute: typeof AuthenticatedMesAvisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/change-password': {
+      id: '/_authenticated/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof AuthenticatedChangePasswordRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/account': {
@@ -168,6 +306,27 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-ferasha/': {
+      id: '/_authenticated/my-ferasha/'
+      path: '/my-ferasha'
+      fullPath: '/my-ferasha/'
+      preLoaderRoute: typeof AuthenticatedMyFerashaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-ferasha/new': {
+      id: '/_authenticated/my-ferasha/new'
+      path: '/my-ferasha/new'
+      fullPath: '/my-ferasha/new'
+      preLoaderRoute: typeof AuthenticatedMyFerashaNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-ferasha/$id': {
+      id: '/_authenticated/my-ferasha/$id'
+      path: '/my-ferasha/$id'
+      fullPath: '/my-ferasha/$id'
+      preLoaderRoute: typeof AuthenticatedMyFerashaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/listings/new': {
@@ -189,16 +348,26 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
-  AuthenticatedMyFerashaRoute: typeof AuthenticatedMyFerashaRoute
+  AuthenticatedChangePasswordRoute: typeof AuthenticatedChangePasswordRoute
+  AuthenticatedMesAvisRoute: typeof AuthenticatedMesAvisRoute
+  AuthenticatedSuperadminRoute: typeof AuthenticatedSuperadminRoute
   AuthenticatedListingsIdRoute: typeof AuthenticatedListingsIdRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
+  AuthenticatedMyFerashaIdRoute: typeof AuthenticatedMyFerashaIdRoute
+  AuthenticatedMyFerashaNewRoute: typeof AuthenticatedMyFerashaNewRoute
+  AuthenticatedMyFerashaIndexRoute: typeof AuthenticatedMyFerashaIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
-  AuthenticatedMyFerashaRoute: AuthenticatedMyFerashaRoute,
+  AuthenticatedChangePasswordRoute: AuthenticatedChangePasswordRoute,
+  AuthenticatedMesAvisRoute: AuthenticatedMesAvisRoute,
+  AuthenticatedSuperadminRoute: AuthenticatedSuperadminRoute,
   AuthenticatedListingsIdRoute: AuthenticatedListingsIdRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
+  AuthenticatedMyFerashaIdRoute: AuthenticatedMyFerashaIdRoute,
+  AuthenticatedMyFerashaNewRoute: AuthenticatedMyFerashaNewRoute,
+  AuthenticatedMyFerashaIndexRoute: AuthenticatedMyFerashaIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -208,8 +377,21 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
+  DevenirProRoute: DevenirProRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
   FerashaSlugRoute: FerashaSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

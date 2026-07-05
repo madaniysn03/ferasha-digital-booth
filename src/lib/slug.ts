@@ -15,10 +15,13 @@ export function contactUrls(opts: {
   phone?: string | null;
   email?: string | null;
   instagram?: string | null;
+  linkedin?: string | null;
+  website?: string | null;
   prefilledMessage?: string;
 }) {
   const msg = opts.prefilledMessage ? encodeURIComponent(opts.prefilledMessage) : "";
   const clean = (s?: string | null) => (s ?? "").replace(/[^\d+]/g, "");
+  const withScheme = (s: string) => (/^https?:\/\//i.test(s) ? s : `https://${s}`);
   return {
     whatsapp: opts.whatsapp
       ? `https://wa.me/${clean(opts.whatsapp).replace(/^\+/, "")}${msg ? `?text=${msg}` : ""}`
@@ -28,5 +31,7 @@ export function contactUrls(opts: {
     instagram: opts.instagram
       ? `https://instagram.com/${opts.instagram.replace(/^@/, "")}`
       : null,
+    linkedin: opts.linkedin ? withScheme(opts.linkedin) : null,
+    website: opts.website ? withScheme(opts.website) : null,
   };
 }

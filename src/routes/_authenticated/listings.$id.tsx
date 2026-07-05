@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Loader2, Save, Trash2, ArrowLeft, Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2, Save, Trash2, ArrowLeft, Pause, Play, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
+import { uploadImage } from "@/lib/upload";
 
 export const Route = createFileRoute("/_authenticated/listings/$id")({
   component: EditListing,
@@ -11,8 +12,12 @@ export const Route = createFileRoute("/_authenticated/listings/$id")({
 function EditListing() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [ferashaId, setFerashaId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", price: "", currency: "MAD",
@@ -22,8 +27,11 @@ function EditListing() {
 
   useEffect(() => {
     (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      setUserId(u.user?.id ?? null);
       const { data } = await supabase.from("listings").select("*").eq("id", id).single();
       if (data) {
+        setFerashaId(data.ferasha_id);
         setForm({
           title: data.title, description: data.description ?? "",
           price: data.price?.toString() ?? "", currency: data.currency,
@@ -34,6 +42,25 @@ function EditListing() {
     })();
   }, [id]);
 
+  function backTo() {
+    return ferashaId ? { to: "/my-ferasha/$id" as const, params: { id: ferashaId } } : { to: "/my-ferasha" as const };
+  }
+
+  async function onImageSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    setUploading(true); setMsg(null);
+    try {
+      const url = await uploadImage("listings", userId, file);
+      setForm((f) => ({ ...f, image_url: url }));
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Échec de l'upload");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setMsg(null);
@@ -43,7 +70,7 @@ function EditListing() {
       type: form.type, image_url: form.image_url || null, status: form.status,
     }).eq("id", id);
     setSaving(false);
-    if (error) setMsg(error.message); else navigate({ to: "/my-ferasha" });
+    if (error) setMsg(error.message); else navigate(backTo());
   }
 
   async function toggleStatus() {
@@ -55,7 +82,7 @@ function EditListing() {
   async function remove() {
     if (!confirm("Supprimer cette publication ?")) return;
     await supabase.from("listings").delete().eq("id", id);
-    navigate({ to: "/my-ferasha" });
+    navigate(backTo());
   }
 
   if (loading) return <div className="grid min-h-screen place-items-center"><Loader2 className="size-6 animate-spin text-secondary" /></div>;
@@ -64,7 +91,7 @@ function EditListing() {
     <div className="min-h-screen pb-12">
       <TopBar />
       <main className="mx-auto max-w-md px-4 py-5">
-        <Link to="/my-ferasha" className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+        <Link {...backTo()} className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-3.5" /> Retour
         </Link>
         <div className="flex items-center justify-between">
@@ -89,13 +116,21 @@ function EditListing() {
             <div className="col-span-2"><Field label="Prix"><input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className={inputCls} /></Field></div>
             <Field label="Devise"><select value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} className={inputCls}><option>MAD</option><option>EUR</option><option>USD</option></select></Field>
           </div>
-          <Field label="URL image"><input type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className={inputCls} /></Field>
+          <Field label="Image">
+            <div className="flex items-center gap-3">
+              {form.image_url && <img src={form.image_url} alt="" className="size-12 shrink-0 rounded-lg object-cover" />}
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={onImageSelected} className="hidden" id="listing-image-upload-edit" />
+              <label htmlFor="listing-image-upload-edit" className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold hover:bg-muted">
+                {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />} {form.image_url ? "Changer" : "Ajouter une image"}
+              </label>
+            </div>
+          </Field>
 
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button type="button" onClick={remove} className="flex items-center justify-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm font-semibold text-destructive hover:bg-destructive/10">
               <Trash2 className="size-4" /> Supprimer
             </button>
-            <button type="submit" disabled={saving} className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:opacity-90 disabled:opacity-50">
+            <button type="submit" disabled={saving || uploading} className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:opacity-90 disabled:opacity-50">
               {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Enregistrer
             </button>
           </div>

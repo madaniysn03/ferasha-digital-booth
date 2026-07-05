@@ -1,18 +1,24 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Loader2, Save, ArrowLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { Loader2, Save, ArrowLeft, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
+import { uploadImage } from "@/lib/upload";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
+  validateSearch: z.object({ ferashaId: z.string().optional() }),
   component: NewListing,
 });
 
 function NewListing() {
   const navigate = useNavigate();
-  const [ferashaId, setFerashaId] = useState<string | null>(null);
+  const { ferashaId } = Route.useSearch();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", price: "", currency: "MAD",
@@ -22,19 +28,32 @@ function NewListing() {
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { data: f } = await supabase.from("ferashas").select("id").eq("owner_id", u.user.id).maybeSingle();
-      setFerashaId(f?.id ?? null);
+      setUserId(u.user?.id ?? null);
       setLoading(false);
     })();
   }, []);
+
+  async function onImageSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    setUploading(true); setMsg(null);
+    try {
+      const url = await uploadImage("listings", userId, file);
+      setForm((f) => ({ ...f, image_url: url }));
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Échec de l'upload");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setMsg(null);
     try {
       const { data: u } = await supabase.auth.getUser();
-      if (!u.user || !ferashaId) throw new Error("Crée d'abord ta Ferasha");
+      if (!u.user || !ferashaId) throw new Error("Ferasha manquante");
       const { error } = await supabase.from("listings").insert({
         ferasha_id: ferashaId, owner_id: u.user.id,
         title: form.title, description: form.description || null,
@@ -42,7 +61,7 @@ function NewListing() {
         type: form.type, image_url: form.image_url || null,
       });
       if (error) throw error;
-      navigate({ to: "/my-ferasha" });
+      navigate({ to: "/my-ferasha/$id", params: { id: ferashaId } });
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Erreur");
       setSaving(false);
@@ -55,10 +74,10 @@ function NewListing() {
     <div className="min-h-screen">
       <TopBar />
       <main className="mx-auto max-w-md px-4 py-12 text-center">
-        <h1 className="font-display text-xl font-bold">Crée d'abord ta Ferasha</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Tu dois ouvrir ta vitrine avant de publier.</p>
+        <h1 className="font-display text-xl font-bold">Choisis d'abord une Ferasha</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Ouvre une de tes Ferashas puis clique sur "Nouveau" pour publier.</p>
         <Link to="/my-ferasha" className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
-          Créer ma Ferasha
+          Mes Ferashas
         </Link>
       </main>
     </div>
@@ -68,7 +87,7 @@ function NewListing() {
     <div className="min-h-screen pb-12">
       <TopBar />
       <main className="mx-auto max-w-md px-4 py-5">
-        <Link to="/my-ferasha" className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+        <Link to="/my-ferasha/$id" params={{ id: ferashaId }} className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-3.5" /> Retour
         </Link>
         <h1 className="font-display text-2xl font-bold">Nouvelle publication</h1>
@@ -104,11 +123,17 @@ function NewListing() {
             </Field>
           </div>
 
-          <Field label="URL de l'image (optionnel)">
-            <input type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." className={inputCls} />
+          <Field label="Image">
+            <div className="flex items-center gap-3">
+              {form.image_url && <img src={form.image_url} alt="" className="size-12 shrink-0 rounded-lg object-cover" />}
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={onImageSelected} className="hidden" id="listing-image-upload" />
+              <label htmlFor="listing-image-upload" className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold hover:bg-muted">
+                {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />} {form.image_url ? "Changer" : "Ajouter une image"}
+              </label>
+            </div>
           </Field>
 
-          <button type="submit" disabled={saving}
+          <button type="submit" disabled={saving || uploading}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground shadow-soft hover:opacity-90 disabled:opacity-50">
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             Publier

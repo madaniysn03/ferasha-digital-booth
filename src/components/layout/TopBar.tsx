@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { LanguageSwitch } from "./LanguageSwitch";
 
-export function TopBar({ right, title }: { right?: ReactNode; title?: string }) {
+export function TopBar({ right, title, showLangSwitch = false }: { right?: ReactNode; title?: string; showLangSwitch?: boolean }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
@@ -15,7 +16,10 @@ export function TopBar({ right, title }: { right?: ReactNode; title?: string }) 
             <span className="text-secondary"> Quantic</span>
           </span>
         </Link>
-        <div className="flex items-center gap-2">{right}</div>
+        <div className="flex items-center gap-2">
+          {showLangSwitch && <LanguageSwitch />}
+          {right}
+        </div>
       </div>
     </header>
   );

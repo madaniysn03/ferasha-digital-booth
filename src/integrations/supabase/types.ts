@@ -24,13 +24,18 @@ export type Database = {
           id: string
           instagram: string | null
           is_published: boolean
+          linkedin: string | null
           logo_url: string | null
           name: string
           owner_id: string
           phone: string | null
+          rating_avg: number
+          rating_count: number
+          search_vector: unknown
           slug: string
           updated_at: string
           views_count: number
+          website: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -42,13 +47,17 @@ export type Database = {
           id?: string
           instagram?: string | null
           is_published?: boolean
+          linkedin?: string | null
           logo_url?: string | null
           name: string
           owner_id: string
           phone?: string | null
+          rating_avg?: number
+          rating_count?: number
           slug: string
           updated_at?: string
           views_count?: number
+          website?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -60,13 +69,17 @@ export type Database = {
           id?: string
           instagram?: string | null
           is_published?: boolean
+          linkedin?: string | null
           logo_url?: string | null
           name?: string
           owner_id?: string
           phone?: string | null
+          rating_avg?: number
+          rating_count?: number
           slug?: string
           updated_at?: string
           views_count?: number
+          website?: string | null
           whatsapp?: string | null
         }
         Relationships: []
@@ -126,40 +139,125 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string
+          allowed_categories: Database["public"]["Enums"]["ferasha_category"][]
           avatar_url: string | null
           city: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
+          must_change_password: boolean
           phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
           updated_at: string
         }
         Insert: {
+          account_status?: string
+          allowed_categories?: Database["public"]["Enums"]["ferasha_category"][]
           avatar_url?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
+          must_change_password?: boolean
           phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
         Update: {
+          account_status?: string
+          allowed_categories?: Database["public"]["Enums"]["ferasha_category"][]
           avatar_url?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
+          must_change_password?: boolean
           phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          author_id: string
+          comment: string | null
+          created_at: string
+          ferasha_id: string
+          id: string
+          rating: number
+          replied_at: string | null
+          reply: string | null
+          reported_count: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          comment?: string | null
+          created_at?: string
+          ferasha_id: string
+          id?: string
+          rating: number
+          replied_at?: string | null
+          reply?: string | null
+          reported_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          comment?: string | null
+          created_at?: string
+          ferasha_id?: string
+          id?: string
+          rating?: number
+          replied_at?: string | null
+          reply?: string | null
+          reported_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_ferasha_id_fkey"
+            columns: ["ferasha_id"]
+            isOneToOne: false
+            referencedRelation: "ferashas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_author_profile_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      public_profile_names: {
+        Row: {
+          id: string
+          full_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      increment_ferasha_views: {
+        Args: { ferasha_id: string }
+        Returns: undefined
+      }
+      report_review: {
+        Args: { review_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       ferasha_category:
@@ -177,6 +275,7 @@ export type Database = {
         | "autre"
       listing_status: "actif" | "pause"
       listing_type: "produit" | "service"
+      user_role: "client" | "pro" | "superadmin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -320,6 +419,7 @@ export const Constants = {
       ],
       listing_status: ["actif", "pause"],
       listing_type: ["produit", "service"],
+      user_role: ["client", "pro", "superadmin"],
     },
   },
 } as const

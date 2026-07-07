@@ -4,6 +4,7 @@ import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
 import { CATEGORIES, CITIES, type CategoryValue } from "@/lib/categories";
+import { CategoryMultiSelect } from "@/components/ferasha/CategoryMultiSelect";
 import { slugify } from "@/lib/slug";
 
 export const Route = createFileRoute("/_authenticated/my-ferasha/new")({
@@ -18,7 +19,7 @@ function NewFerasha() {
   const [allowedCategories, setAllowedCategories] = useState<CategoryValue[] | null>(null);
 
   const [form, setForm] = useState({
-    name: "", category: "", city: "Casablanca", bio: "",
+    name: "", categories: [] as CategoryValue[], city: "Casablanca", bio: "",
     whatsapp: "", phone: "", email: "", instagram: "", linkedin: "", website: "",
   });
 
@@ -29,7 +30,7 @@ function NewFerasha() {
       const { data: prof } = await supabase.from("profiles").select("role, allowed_categories").eq("id", u.user.id).maybeSingle();
       const options = prof?.role === "superadmin" ? CATEGORIES.map((c) => c.value) : ((prof?.allowed_categories as CategoryValue[] | undefined) ?? []);
       setAllowedCategories(options);
-      setForm((f) => ({ ...f, category: options[0] ?? "" }));
+      setForm((f) => ({ ...f, categories: options[0] ? [options[0]] : [] }));
       setLoading(false);
     })();
   }, []);
@@ -40,7 +41,7 @@ function NewFerasha() {
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Non connecté");
-      if (!form.category) throw new Error("Aucune catégorie autorisée sur ton compte — contacte le superadmin.");
+      if (form.categories.length === 0) throw new Error("Choisis au moins une catégorie.");
 
       let slug = slugify(form.name) || "ferasha";
       let attempt = slug;
@@ -52,7 +53,7 @@ function NewFerasha() {
 
       const { data: created, error } = await supabase.from("ferashas").insert({
         owner_id: u.user.id, name: form.name, slug,
-        category: form.category as never, city: form.city, bio: form.bio || null,
+        category: form.categories[0] as never, categories: form.categories as never, city: form.city, bio: form.bio || null,
         whatsapp: form.whatsapp || null, phone: form.phone || null,
         email: form.email || null, instagram: form.instagram || null,
         linkedin: form.linkedin || null, website: form.website || null,
@@ -84,18 +85,18 @@ function NewFerasha() {
             <Field label="Nom de la Ferasha *">
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Ex. Atelier Salma" className={inputCls} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Catégorie *">
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputCls}>
-                  {CATEGORIES.filter((c) => allowedCategories?.includes(c.value)).map((c) => <option key={c.value} value={c.value}>{c.emoji} {c.label}</option>)}
-                </select>
-              </Field>
-              <Field label="Ville *">
-                <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls}>
-                  {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </Field>
-            </div>
+            <Field label="Catégories * (une ou plusieurs)">
+              <CategoryMultiSelect
+                options={allowedCategories ?? []}
+                value={form.categories}
+                onChange={(categories) => setForm({ ...form, categories })}
+              />
+            </Field>
+            <Field label="Ville *">
+              <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls}>
+                {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </Field>
             <Field label="Présentation courte">
               <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} placeholder="Quelques mots sur ton activité..." className={`${inputCls} h-auto py-2.5 resize-none`} />
             </Field>

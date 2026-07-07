@@ -17,6 +17,7 @@ export type Database = {
       ferashas: {
         Row: {
           bio: string | null
+          categories: Database["public"]["Enums"]["ferasha_category"][]
           category: Database["public"]["Enums"]["ferasha_category"]
           city: string
           created_at: string
@@ -26,6 +27,7 @@ export type Database = {
           is_published: boolean
           linkedin: string | null
           logo_url: string | null
+          moderation_status: string
           name: string
           owner_id: string
           phone: string | null
@@ -33,6 +35,8 @@ export type Database = {
           rating_count: number
           search_vector: unknown
           slug: string
+          suspended_at: string | null
+          suspended_reason: string | null
           updated_at: string
           views_count: number
           website: string | null
@@ -40,6 +44,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          categories?: Database["public"]["Enums"]["ferasha_category"][]
           category: Database["public"]["Enums"]["ferasha_category"]
           city: string
           created_at?: string
@@ -49,12 +54,15 @@ export type Database = {
           is_published?: boolean
           linkedin?: string | null
           logo_url?: string | null
+          moderation_status?: string
           name: string
           owner_id: string
           phone?: string | null
           rating_avg?: number
           rating_count?: number
           slug: string
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           views_count?: number
           website?: string | null
@@ -62,6 +70,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          categories?: Database["public"]["Enums"]["ferasha_category"][]
           category?: Database["public"]["Enums"]["ferasha_category"]
           city?: string
           created_at?: string
@@ -71,12 +80,15 @@ export type Database = {
           is_published?: boolean
           linkedin?: string | null
           logo_url?: string | null
+          moderation_status?: string
           name?: string
           owner_id?: string
           phone?: string | null
           rating_avg?: number
           rating_count?: number
           slug?: string
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           views_count?: number
           website?: string | null

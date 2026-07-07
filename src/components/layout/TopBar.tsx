@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { LanguageSwitch } from "./LanguageSwitch";
+import { AccountMenu } from "./AccountMenu";
 
 export function TopBar({ right, title, showLangSwitch = false }: { right?: ReactNode; title?: string; showLangSwitch?: boolean }) {
   return (
@@ -19,6 +20,7 @@ export function TopBar({ right, title, showLangSwitch = false }: { right?: React
         <div className="flex items-center gap-2">
           {showLangSwitch && <LanguageSwitch />}
           {right}
+          <AccountMenu />
         </div>
       </div>
     </header>

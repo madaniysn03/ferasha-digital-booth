@@ -95,3 +95,33 @@ export const updateProAccess = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// Suspend / réactive une Ferasha précise (modération), sans toucher au reste du
+// compte. Passe par l'Admin API (service_role) car seul lui contourne le trigger
+// `protect_ferasha_moderation`. L'état est ensuite reflété partout via la RLS.
+export const moderateFerasha = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      ferashaId: z.string().uuid(),
+      status: z.enum(["active", "suspended"]),
+      reason: z.string().max(500).optional(),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperadmin(context.supabase, context.userId);
+
+    const patch =
+      data.status === "suspended"
+        ? {
+            moderation_status: "suspended",
+            suspended_at: new Date().toISOString(),
+            suspended_reason: data.reason?.trim() || null,
+          }
+        : { moderation_status: "active", suspended_at: null, suspended_reason: null };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("ferashas").update(patch).eq("id", data.ferashaId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

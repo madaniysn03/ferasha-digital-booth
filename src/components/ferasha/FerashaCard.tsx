@@ -6,13 +6,16 @@ type Props = {
   slug: string;
   name: string;
   category: string;
+  categories?: string[];
   city: string;
   bio?: string | null;
   logo_url?: string | null;
 };
 
-export function FerashaCard({ slug, name, category, city, bio, logo_url }: Props) {
+export function FerashaCard({ slug, name, category, categories, city, bio, logo_url }: Props) {
   const initial = name.charAt(0).toUpperCase();
+  // Catégories secondaires (hors principale) à afficher en petit sous le nom.
+  const extra = (categories ?? []).filter((c) => c !== category);
   return (
     <Link
       to="/ferasha/$slug"
@@ -36,6 +39,15 @@ export function FerashaCard({ slug, name, category, city, bio, logo_url }: Props
         <p className="flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="size-3" /> {city}
         </p>
+        {extra.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {extra.map((c) => (
+              <span key={c} className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {categoryEmoji(c)} {categoryLabel(c)}
+              </span>
+            ))}
+          </div>
+        )}
         {bio ? (
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{bio}</p>
         ) : null}

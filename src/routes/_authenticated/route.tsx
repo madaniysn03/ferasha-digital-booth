@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
 
     if (profile?.account_status === "suspended") {
       await supabase.auth.signOut();
-      throw redirect({ to: "/auth" });
+      throw redirect({ to: "/auth", search: { reason: "suspended" } });
     }
 
     if (profile?.must_change_password && location.pathname !== "/change-password") {

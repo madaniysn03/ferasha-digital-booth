@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
 });
 
 type Ferasha = {
-  id: string; name: string; slug: string; category: string;
+  id: string; name: string; slug: string; category: string; categories: string[];
   city: string; bio: string | null; logo_url: string | null; created_at: string;
 };
 
@@ -46,9 +46,9 @@ function Explorer() {
   async function fetchPage(reset: boolean, cursor?: { created_at: string; id: string }) {
     let query = supabase
       .from("ferashas")
-      .select("id,name,slug,category,city,bio,logo_url,created_at")
+      .select("id,name,slug,category,categories,city,bio,logo_url,created_at")
       .eq("is_published", true);
-    if (cat) query = query.eq("category", cat as never);
+    if (cat) query = query.contains("categories", [cat]);
     if (city) query = query.eq("city", city);
     if (debouncedQ.trim()) query = query.textSearch("search_vector", debouncedQ.trim(), { type: "websearch", config: "french" });
     if (cursor) {

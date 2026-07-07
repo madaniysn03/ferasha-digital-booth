@@ -30,7 +30,7 @@ export const Route = createFileRoute("/ferasha/$slug")({
 });
 
 type F = {
-  id: string; name: string; slug: string; category: string; city: string;
+  id: string; name: string; slug: string; category: string; categories: string[] | null; city: string;
   bio: string | null; logo_url: string | null; whatsapp: string | null;
   phone: string | null; email: string | null; instagram: string | null;
   linkedin: string | null; website: string | null;
@@ -87,9 +87,13 @@ function FerashaPublic() {
             </div>
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold leading-tight">{f.name}</h1>
-              <p className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-background/20 px-2.5 py-1 text-xs font-medium backdrop-blur">
-                {categoryEmoji(f.category)} {categoryLabelFor(f.category, locale)}
-              </p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {(f.categories?.length ? f.categories : [f.category]).map((c) => (
+                  <span key={c} className="inline-flex items-center gap-1.5 rounded-full bg-background/20 px-2.5 py-1 text-xs font-medium backdrop-blur">
+                    {categoryEmoji(c)} {categoryLabelFor(c, locale)}
+                  </span>
+                ))}
+              </div>
               <p className="mt-2 flex items-center gap-1 text-sm opacity-90">
                 <MapPin className="size-3.5" /> {f.city}
               </p>

@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Save, ArrowLeft, Eye, ExternalLink, Plus, Upload, Trash2 } from "lucide-react";
+import { Loader2, Save, ArrowLeft, Eye, ExternalLink, Plus, Upload, Trash2, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
 import { ListingCard } from "@/components/ferasha/ListingCard";
 import { ProReviewsSection } from "@/components/ferasha/ProReviewsSection";
+import { CategoryMultiSelect } from "@/components/ferasha/CategoryMultiSelect";
 import { CATEGORIES, CITIES, type CategoryValue } from "@/lib/categories";
 import { uploadImage } from "@/lib/upload";
 
@@ -13,10 +14,11 @@ export const Route = createFileRoute("/_authenticated/my-ferasha/$id")({
 });
 
 type Ferasha = {
-  id: string; name: string; slug: string; category: string; city: string;
+  id: string; name: string; slug: string; category: string; categories: string[]; city: string;
   bio: string | null; logo_url: string | null; whatsapp: string | null;
   phone: string | null; email: string | null; instagram: string | null;
   linkedin: string | null; website: string | null; is_published: boolean; views_count: number;
+  moderation_status: string; suspended_reason: string | null;
 };
 type Listing = {
   id: string; title: string; description: string | null; price: number | null;
@@ -37,7 +39,7 @@ function EditFerasha() {
   const [userId, setUserId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    name: "", category: "", city: "Casablanca", bio: "", logo_url: "",
+    name: "", categories: [] as CategoryValue[], city: "Casablanca", bio: "", logo_url: "",
     whatsapp: "", phone: "", email: "", instagram: "", linkedin: "", website: "",
   });
 
@@ -52,7 +54,9 @@ function EditFerasha() {
     if (f) {
       setFerasha(f as Ferasha);
       setForm({
-        name: f.name, category: f.category, city: f.city, bio: f.bio ?? "", logo_url: f.logo_url ?? "",
+        name: f.name,
+        categories: ((f.categories as CategoryValue[] | null)?.length ? (f.categories as CategoryValue[]) : [f.category as CategoryValue]),
+        city: f.city, bio: f.bio ?? "", logo_url: f.logo_url ?? "",
         whatsapp: f.whatsapp ?? "", phone: f.phone ?? "", email: f.email ?? "", instagram: f.instagram ?? "",
         linkedin: f.linkedin ?? "", website: f.website ?? "",
       });
@@ -67,10 +71,11 @@ function EditFerasha() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!ferasha) return;
+    if (form.categories.length === 0) { setMsg("Choisis au moins une catégorie."); return; }
     setSaving(true); setMsg(null);
     try {
       const { error } = await supabase.from("ferashas").update({
-        name: form.name, category: form.category as never, city: form.city,
+        name: form.name, category: form.categories[0] as never, categories: form.categories as never, city: form.city,
         bio: form.bio || null, logo_url: form.logo_url || null,
         whatsapp: form.whatsapp || null, phone: form.phone || null,
         email: form.email || null, instagram: form.instagram || null,
@@ -125,6 +130,20 @@ function EditFerasha() {
           <ArrowLeft className="size-3.5" /> Retour à mes Ferashas
         </Link>
 
+        {ferasha.moderation_status === "suspended" && (
+          <div className="flex items-start gap-3 rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-4">
+            <ShieldAlert className="mt-0.5 size-5 shrink-0 text-destructive" />
+            <div>
+              <p className="text-sm font-semibold text-destructive">Ferasha suspendue par la modération</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Elle n'est plus visible publiquement. Tu peux toujours modifier son contenu, mais elle restera masquée
+                tant qu'un administrateur ne l'aura pas réactivée.
+                {ferasha.suspended_reason ? <> Motif : <span className="font-medium">{ferasha.suspended_reason}</span></> : null}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-soft">
           <div>
             <p className="text-xs text-muted-foreground">Lien public · {ferasha.views_count} vues</p>
@@ -158,18 +177,18 @@ function EditFerasha() {
           <Field label="Nom de la Ferasha *">
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className={inputCls} />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Catégorie *">
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputCls}>
-                {CATEGORIES.filter((c) => allowedCategories.includes(c.value) || c.value === form.category).map((c) => <option key={c.value} value={c.value}>{c.emoji} {c.label}</option>)}
-              </select>
-            </Field>
-            <Field label="Ville *">
-              <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls}>
-                {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </Field>
-          </div>
+          <Field label="Catégories * (une ou plusieurs)">
+            <CategoryMultiSelect
+              options={Array.from(new Set([...allowedCategories, ...form.categories]))}
+              value={form.categories}
+              onChange={(categories) => setForm({ ...form, categories })}
+            />
+          </Field>
+          <Field label="Ville *">
+            <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls}>
+              {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </Field>
           <Field label="Présentation courte">
             <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className={`${inputCls} h-auto py-2.5 resize-none`} />
           </Field>

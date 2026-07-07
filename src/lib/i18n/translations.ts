@@ -1,7 +1,7 @@
 export type Locale = "fr" | "ar";
 
 export type Translations = {
-  nav: { explore: string; myFerasha: string; publish: string; account: string };
+  nav: { explore: string; myFerasha: string; publish: string; account: string; signOut: string; signIn: string; myAccount: string };
   home: {
     tagline: string; title: string; titleHighlight: string; subtitle: string;
     createCta: string; loginCta: string; searchPlaceholder: string;
@@ -9,9 +9,12 @@ export type Translations = {
   };
   auth: {
     signupTitle: string; signinTitle: string; signupSubtitle: string; signinSubtitle: string;
-    google: string; orEmail: string; fullName: string; email: string; password: string;
+    orEmail: string; fullName: string; email: string; password: string;
     createAccount: string; signIn: string; hasAccount: string; noAccount: string;
     switchToSignin: string; switchToSignup: string; backHome: string;
+    signupSuccess: string; errInvalid: string; errUnconfirmed: string;
+    errUserExists: string; errRateLimit: string; errServer: string;
+    errNetwork: string; errSuspended: string; errGeneric: string;
   };
   ferasha: {
     publications: string; noPublications: string; reviews: string; leaveReview: string;
@@ -35,6 +38,9 @@ const fr: Translations = {
     myFerasha: "Ma Ferasha",
     publish: "Publier",
     account: "Compte",
+    signOut: "Déconnexion",
+    signIn: "Se connecter",
+    myAccount: "Mon compte",
   },
   home: {
     tagline: "Ta Ferasha digitale, en 1 minute",
@@ -55,7 +61,6 @@ const fr: Translations = {
     signinTitle: "Bon retour 👋",
     signupSubtitle: "Crée ton compte en 30 secondes.",
     signinSubtitle: "Connecte-toi pour gérer ta vitrine.",
-    google: "Continuer avec Google",
     orEmail: "ou par email",
     fullName: "Nom complet",
     email: "Email",
@@ -67,6 +72,15 @@ const fr: Translations = {
     switchToSignin: "Se connecter",
     switchToSignup: "Créer un compte",
     backHome: "Retour à l'accueil",
+    signupSuccess: "Compte créé ! Tu peux te connecter maintenant.",
+    errInvalid: "Email ou mot de passe incorrect. Vérifie tes identifiants, ou utilise « Créer un compte » si tu n'en as pas.",
+    errUnconfirmed: "Ton email n'est pas encore confirmé. Ouvre le lien reçu par email avant de te connecter.",
+    errUserExists: "Un compte existe déjà avec cet email. Connecte-toi plutôt que de créer un compte.",
+    errRateLimit: "Trop de tentatives. Patiente une minute avant de réessayer.",
+    errServer: "Le problème vient du serveur, pas de tes identifiants. Réessaie dans un instant ; si ça persiste, contacte l'administrateur.",
+    errNetwork: "Connexion au serveur impossible. Vérifie ta connexion internet puis réessaie.",
+    errSuspended: "Ton compte a été suspendu par l'administrateur. Contacte-le pour le réactiver.",
+    errGeneric: "Une erreur inattendue est survenue. Réessaie, et si le problème persiste contacte l'administrateur.",
   },
   ferasha: {
     publications: "Publications",
@@ -120,6 +134,9 @@ const ar: Translations = {
     myFerasha: "فيراشتي",
     publish: "انشر",
     account: "حسابي",
+    signOut: "تسجيل الخروج",
+    signIn: "تسجيل الدخول",
+    myAccount: "حسابي",
   },
   home: {
     tagline: "فيراشتك الرقمية في دقيقة واحدة",
@@ -140,7 +157,6 @@ const ar: Translations = {
     signinTitle: "مرحبًا بعودتك 👋",
     signupSubtitle: "أنشئ حسابك في 30 ثانية.",
     signinSubtitle: "سجّل الدخول لإدارة واجهتك.",
-    google: "المتابعة باستخدام جوجل",
     orEmail: "أو عبر البريد الإلكتروني",
     fullName: "الاسم الكامل",
     email: "البريد الإلكتروني",
@@ -152,6 +168,15 @@ const ar: Translations = {
     switchToSignin: "تسجيل الدخول",
     switchToSignup: "إنشاء حساب",
     backHome: "العودة إلى الرئيسية",
+    signupSuccess: "تم إنشاء الحساب! يمكنك تسجيل الدخول الآن.",
+    errInvalid: "البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقّق من بياناتك، أو استخدم «إنشاء حساب» إن لم يكن لديك حساب.",
+    errUnconfirmed: "لم يتم تأكيد بريدك الإلكتروني بعد. افتح الرابط المُرسَل إلى بريدك قبل تسجيل الدخول.",
+    errUserExists: "يوجد حساب بهذا البريد الإلكتروني بالفعل. سجّل الدخول بدل إنشاء حساب.",
+    errRateLimit: "محاولات كثيرة جدًا. انتظر دقيقة قبل إعادة المحاولة.",
+    errServer: "المشكلة من الخادم وليست من بياناتك. أعد المحاولة بعد قليل، وإن استمرّت المشكلة تواصل مع المسؤول.",
+    errNetwork: "تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت ثم أعد المحاولة.",
+    errSuspended: "تم تعليق حسابك من قِبل المسؤول. تواصل معه لإعادة تفعيله.",
+    errGeneric: "حدث خطأ غير متوقع. أعد المحاولة، وإن استمرّت المشكلة تواصل مع المسؤول.",
   },
   ferasha: {
     publications: "المنشورات",

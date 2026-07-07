@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Plus, Eye, EyeOff, MapPin } from "lucide-react";
+import { Loader2, Plus, Eye, EyeOff, MapPin, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -12,11 +12,10 @@ export const Route = createFileRoute("/_authenticated/my-ferasha/")({
 
 type Ferasha = {
   id: string; name: string; slug: string; category: string; city: string;
-  logo_url: string | null; is_published: boolean; views_count: number;
+  logo_url: string | null; is_published: boolean; views_count: number; moderation_status: string;
 };
 
 function MyFerashaList() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [ferashas, setFerashas] = useState<Ferasha[]>([]);
   const [role, setRole] = useState<"client" | "pro" | "superadmin">("client");
@@ -29,7 +28,7 @@ function MyFerashaList() {
       if (prof?.role) setRole(prof.role);
       const { data: f } = await supabase
         .from("ferashas")
-        .select("id, name, slug, category, city, logo_url, is_published, views_count")
+        .select("id, name, slug, category, city, logo_url, is_published, views_count, moderation_status")
         .eq("owner_id", u.user.id)
         .order("created_at", { ascending: false });
       setFerashas((f as Ferasha[] | null) ?? []);
@@ -37,22 +36,13 @@ function MyFerashaList() {
     })();
   }, []);
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/" });
-  }
-
   if (loading) return (
     <div className="grid min-h-screen place-items-center"><Loader2 className="size-6 animate-spin text-secondary" /></div>
   );
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
-      <TopBar right={
-        <button onClick={signOut} className="text-xs text-muted-foreground hover:text-foreground">
-          Déconnexion
-        </button>
-      } />
+      <TopBar />
 
       <main className="mx-auto max-w-2xl px-4 py-5 space-y-6">
         <div className="flex items-center justify-between">
@@ -100,10 +90,16 @@ function MyFerashaList() {
                     {categoryLabel(f.category)} · <MapPin className="size-3" /> {f.city}
                   </p>
                 </div>
-                <span className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ${f.is_published ? "bg-secondary/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
-                  {f.is_published ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
-                  {f.is_published ? "Publiée" : "Masquée"}
-                </span>
+                {f.moderation_status === "suspended" ? (
+                  <span className="flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-1 text-[10px] font-semibold text-destructive">
+                    <ShieldAlert className="size-3" /> Suspendue
+                  </span>
+                ) : (
+                  <span className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ${f.is_published ? "bg-secondary/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
+                    {f.is_published ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+                    {f.is_published ? "Publiée" : "Masquée"}
+                  </span>
+                )}
               </Link>
             ))}
           </div>

@@ -1,12 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, UserPlus, Ban, CheckCircle2, Pencil, Save, X } from "lucide-react";
+import { Loader2, ShieldCheck, UserPlus, Ban, CheckCircle2, Pencil, Save, X, Store, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { CATEGORIES, categoryLabel, type CategoryValue } from "@/lib/categories";
 import { provisionPro, updateProAccess } from "@/lib/api/superadmin.functions";
 import { ReviewModerationSection } from "@/components/ferasha/ReviewModerationSection";
+import { AdminProFerashas } from "@/components/ferasha/AdminProFerashas";
 
 export const Route = createFileRoute("/_authenticated/superadmin")({
   beforeLoad: ({ context }) => {
@@ -34,6 +35,7 @@ function SuperadminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCategories, setEditCategories] = useState<CategoryValue[]>([]);
   const [savingCategories, setSavingCategories] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   async function loadPros() {
     const { data } = await supabase
@@ -210,6 +212,20 @@ function SuperadminPage() {
                   )}
                   {p.must_change_password && (
                     <p className="mt-2 text-[10px] font-medium text-accent">En attente du 1ᵉʳ changement de mot de passe</p>
+                  )}
+
+                  <button
+                    onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
+                  >
+                    <Store className="size-3.5" />
+                    {expandedId === p.id ? "Masquer ses Ferashas" : "Voir ses Ferashas & services"}
+                    {expandedId === p.id ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                  </button>
+                  {expandedId === p.id && (
+                    <div className="mt-3 border-t border-border pt-3">
+                      <AdminProFerashas proId={p.id} />
+                    </div>
                   )}
                 </div>
               ))}

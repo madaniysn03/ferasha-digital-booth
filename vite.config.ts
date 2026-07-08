@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Force-enable nitro with the Node preset so `npm run build` emits a
+  // standalone Node server (.output/server/index.mjs) for self-hosting on our VPS.
+  // Inside the Lovable sandbox this is ignored — the sandbox forces the Cloudflare
+  // preset regardless — so this only affects self-hosted / CI builds.
+  nitro: { preset: "node-server" },
 });
